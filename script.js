@@ -10,21 +10,21 @@ const firebaseConfig = {
     measurementId: "G-QQ83NYBSTV"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
+const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
 
 let dadosGlobais = {};
 let tarefas = [];
 let pedidosClientes = [];
 let encomendasPedidas = [];
+let armasList = [];
 let reunioes = [];
 let faltas = [];
 let avisos = [];
 
-// ESCUTAR NUVEM (TEMPO REAL)
+// ESCUTAR NUVEM
 db.ref('tarefas').on('value', (snapshot) => {
     tarefas = snapshot.val() || [];
     renderTarefas();
@@ -38,6 +38,12 @@ db.ref('pedidos_clientes').on('value', (snapshot) => {
 db.ref('encomendas_pedidas').on('value', (snapshot) => {
     encomendasPedidas = snapshot.val() || [];
     carregarEncomendasPedidas();
+});
+
+db.ref('armas').on('value', (snapshot) => {
+    armasList = snapshot.val() || [];
+    carregarArmas();
+    atualizarSelectArmas();
 });
 
 db.ref('reunioes').on('value', (snapshot) => {
@@ -60,7 +66,6 @@ categorias.forEach(cat => {
         dadosGlobais[cat] = snapshot.val() || [];
         carregarCards(cat);
         if (cat === 'produtos') atualizarSelectProdutos();
-        if (cat === 'armas') atualizarSelectArmas();
     });
 });
 
@@ -139,13 +144,46 @@ function atualizarSelectProdutos() {
 function atualizarSelectArmas() {
     const select = document.getElementById('enc-arma-select');
     if (!select) return;
-    const armas = dadosGlobais['armas'] || [];
 
-    select.innerHTML = '<option value="">-- Seleciona uma Arma / Munição cadastrada --</option>';
-    armas.forEach((a, idx) => {
-        const preco = parseFloat(a.detalhes) || 0;
-        select.innerHTML += `<option value="${idx}">${a.nome} - ${preco.toFixed(2)}€ / un</option>`;
+    select.innerHTML = '<option value="">-- Seleciona uma Arma cadastrada --</option>';
+    armasList.forEach((a, idx) => {
+        const precoVenda = parseFloat(a.venda) || 0;
+        select.innerHTML += `<option value="${idx}">${a.nome} - ${precoVenda.toFixed(2)}€ / un</option>`;
     });
+}
+
+// ARMAS (NOVO FORMATO)
+function addArma(e) {
+    e.preventDefault();
+    const nome = document.getElementById('arma-nome').value.trim();
+    const custo = parseFloat(document.getElementById('arma-custo').value) || 0;
+    const venda = parseFloat(document.getElementById('arma-venda').value) || 0;
+
+    armasList.push({ nome, custo, venda });
+    db.ref('armas').set(armasList);
+    e.target.reset();
+}
+
+function carregarArmas() {
+    const container = document.getElementById('grid-armas-novo');
+    if (!container) return;
+    container.innerHTML = '';
+
+    armasList.forEach((item, index) => {
+        container.innerHTML += `
+            <div class="item-card">
+                <button class="btn-apagar-card" onclick="removerArma(${index})">✕</button>
+                <h4>⚔️ ${item.nome}</h4>
+                <div class="sub-info">Preço Custo: ${item.custo.toFixed(2)} €</div>
+                <div class="total-destaque">Preço Venda: ${item.venda.toFixed(2)} €</div>
+            </div>
+        `;
+    });
+}
+
+function removerArma(index) {
+    armasList.splice(index, 1);
+    db.ref('armas').set(armasList);
 }
 
 // PEDIDOS CLIENTES
@@ -157,7 +195,7 @@ function addPedidoCliente(e) {
     const qtd = parseInt(document.getElementById('pedido-qtd').value);
 
     if (prodIndex === "") {
-        alert("Regista primeiro um produto na aba 'Preços de Produtos'!");
+        alert("Regista primeiro um produto!");
         return;
     }
 
@@ -181,12 +219,12 @@ function carregarPedidosClientes() {
     pedidosClientes.forEach((item, index) => {
         totalGeral += item.total;
         container.innerHTML += `
-            <div class="item-card fatura-card">
+            <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerPedidoCliente(${index})">✕</button>
                 <h4>👤 ${item.cliente}</h4>
                 <div class="sub-info">🏢 ${item.empresa}</div>
                 <p>📦 <strong>${item.qtd}x</strong> ${item.item}</p>
-                <div class="sub-info">Preço Unit.: ${item.precoUnitario.toFixed(2)}€</div>
+                <div class="sub-info">Unit.: ${item.precoUnitario.toFixed(2)}€</div>
                 <div class="total-destaque">TOTAL: ${item.total.toFixed(2)}€</div>
             </div>
         `;
@@ -210,13 +248,12 @@ function addEncomendaArma(e) {
     const qtd = parseInt(document.getElementById('enc-qtd').value);
 
     if (armaIndex === "") {
-        alert("Regista primeiro uma arma ou munição na aba 'Preços de Armas'!");
+        alert("Regista primeiro uma arma!");
         return;
     }
 
-    const armas = dadosGlobais['armas'] || [];
-    const armaSel = armas[armaIndex];
-    const precoUnitario = parseFloat(armaSel.detalhes) || 0;
+    const armaSel = armasList[armaIndex];
+    const precoUnitario = parseFloat(armaSel.venda) || 0;
     const total = precoUnitario * qtd;
 
     encomendasPedidas.push({ comprador, fornecedor, item: armaSel.nome, qtd, precoUnitario, total });
@@ -234,12 +271,12 @@ function carregarEncomendasPedidas() {
     encomendasPedidas.forEach((item, index) => {
         totalGeral += item.total;
         container.innerHTML += `
-            <div class="item-card encomenda-card">
+            <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerEncomendaPedida(${index})">✕</button>
                 <h4>⚔️ ${item.item}</h4>
                 <div class="sub-info">👤 Comprador: ${item.comprador}</div>
                 <div class="sub-info">🏭 Fornecedor: ${item.fornecedor}</div>
-                <p>Qtd: <strong>${item.qtd}x</strong> | Unit: ${item.precoUnitario.toFixed(2)}€</p>
+                <p>Qtd: <strong>${item.qtd}x</strong></p>
                 <div class="total-destaque">TOTAL: ${item.total.toFixed(2)}€</div>
             </div>
         `;
@@ -254,7 +291,7 @@ function removerEncomendaPedida(index) {
     db.ref('encomendas_pedidas').set(encomendasPedidas);
 }
 
-// LÓGICA DE REUNIÕES, FALTAS E AVISOS
+// REUNIÕES, FALTAS, AVISOS
 function addReuniao(e) {
     e.preventDefault();
     const motivo = document.getElementById('reuniao-motivo').value.trim();
@@ -276,8 +313,8 @@ function carregarReunioes() {
             <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerReuniao(${idx})">✕</button>
                 <h4>🗣️ ${r.motivo}</h4>
-                <div class="sub-info">⏰ Horário: <strong>${r.horas}</strong></div>
-                <p style="margin-top: 8px;">📜 <strong>Assunto:</strong> ${r.assunto}</p>
+                <div class="sub-info">⏰ ${r.horas}</div>
+                <p style="margin-top: 4px;">📜 ${r.assunto}</p>
             </div>
         `;
     });
@@ -305,10 +342,10 @@ function carregarFaltas() {
 
     faltas.forEach((f, idx) => {
         container.innerHTML += `
-            <div class="item-card" style="border-left: 4px solid #ff4d4d;">
+            <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerFalta(${idx})">✕</button>
                 <h4>🚫 ${f.nome}</h4>
-                <p style="margin-top: 6px; font-size: 0.9em; opacity: 0.8;">Motivo: ${f.motivo}</p>
+                <p style="font-size: 0.75rem; color: #7a7367;">Motivo: ${f.motivo}</p>
             </div>
         `;
     });
@@ -336,10 +373,10 @@ function carregarAvisos() {
 
     avisos.forEach((a, idx) => {
         container.innerHTML += `
-            <div class="item-card" style="border-left: 4px solid #ffcc00;">
+            <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerAviso(${idx})">✕</button>
                 <h4>⚠️ ${a.titulo}</h4>
-                <p style="margin-top: 6px;">${a.texto}</p>
+                <p style="margin-top: 4px;">${a.texto}</p>
             </div>
         `;
     });
@@ -350,7 +387,7 @@ function removerAviso(index) {
     db.ref('avisos').set(avisos);
 }
 
-// OUTROS CARDS (Geral/Parcerias)
+// OUTROS CARDS
 function carregarCards(categoria) {
     const dados = dadosGlobais[categoria] || [];
     const container = document.getElementById(`grid-${categoria}`);
@@ -359,10 +396,10 @@ function carregarCards(categoria) {
     container.innerHTML = '';
     dados.forEach((item, index) => {
         const imgHtml = item.imagem ? `<img src="${item.imagem}" alt="${item.nome}" onerror="this.style.display='none'">` : '';
-        const linkHtml = item.link ? `<a href="${item.link}" target="_blank">🔗 Abrir Link / Mapa</a>` : '';
+        const linkHtml = item.link ? `<a href="${item.link}" target="_blank">🔗 Abrir Link</a>` : '';
         
         let valorExibicao = item.detalhes;
-        if (categoria === 'produtos' || categoria === 'armas') {
+        if (categoria === 'produtos') {
             const num = parseFloat(item.detalhes) || 0;
             valorExibicao = `${num.toFixed(2)} € / un`;
         }
