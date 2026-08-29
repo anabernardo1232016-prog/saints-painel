@@ -1,7 +1,8 @@
-// COLOCAR ISTO BEM NO TOPO DO SCRIPT.JS
+// 1. CONFIGURAÇÃO DO FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyBR97HiVaf9kyywKoukzWArUSqp1maraUI",
     authDomain: "saints-panel.firebaseapp.com",
+    databaseURL: "https://saints-panel-default-rtdb.firebaseio.com",
     projectId: "saints-panel",
     storageBucket: "saints-panel.firebasestorage.app",
     messagingSenderId: "260768238219",
@@ -9,10 +10,50 @@ const firebaseConfig = {
     measurementId: "G-QQ83NYBSTV"
 };
 
+// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ALTERNAR ABAS
+// Categorias dinâmicas do painel
+const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa'];
+
+// Memória local cache
+let dadosGlobais = {};
+let tarefas = [];
+let pedidosClientes = [];
+let encomendasPedidas = [];
+
+// 2. SINCRONIZAÇÃO EM TEMPO REAL (NUVEM -> ECRÃ)
+
+// Escutar Tarefas
+db.ref('tarefas').on('value', (snapshot) => {
+    tarefas = snapshot.val() || [];
+    renderTarefas();
+});
+
+// Escutar Pedidos Clientes
+db.ref('pedidos_clientes').on('value', (snapshot) => {
+    pedidosClientes = snapshot.val() || [];
+    carregarPedidosClientes();
+});
+
+// Escutar Encomendas Pedidas
+db.ref('encomendas_pedidas').on('value', (snapshot) => {
+    encomendasPedidas = snapshot.val() || [];
+    carregarEncomendasPedidas();
+});
+
+// Escutar todas as outras categorias (Produtos, Armas, Spots, etc.)
+categorias.forEach(cat => {
+    db.ref(`categoria_${cat}`).on('value', (snapshot) => {
+        dadosGlobais[cat] = snapshot.val() || [];
+        carregarCards(cat);
+        if (cat === 'produtos') atualizarSelectProdutos();
+        if (cat === 'armas') atualizarSelectArmas();
+    });
+});
+
+// 3. ALTERNAR ABAS
 function mudarAba(idAba, btn) {
     document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.remove('ativa'));
     document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('ativo'));
@@ -31,16 +72,16 @@ function atualizarRelogio() {
     const minutos = String(agora.getMinutes()).padStart(2, '0');
     const segundos = String(agora.getSeconds()).padStart(2, '0');
     
-    document.getElementById('relogio').textContent = `${horas}:${minutos}:${segundos}`;
+    const relogioEl = document.getElementById('relogio');
+    if (relogioEl) relogioEl.textContent = `${horas}:${minutos}:${segundos}`;
 }
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 
 // GESTÃO DE TAREFAS
-let tarefas = JSON.parse(localStorage.getItem('saints_t')) || [];
-
 function renderTarefas() {
     const list = document.getElementById('lista-tarefas');
+    if (!list) return;
     list.innerHTML = '';
     
     tarefas.forEach((t, i) => {
@@ -52,29 +93,30 @@ function renderTarefas() {
         `;
     });
 
-    document.getElementById('qtd-tarefas').textContent = tarefas.length;
-    document.getElementById('msg-tarefas').textContent = tarefas.length === 0 ? 'Tudo concluído. 🎉' : `Existem ${tarefas.length} tarefas por fazer.`;
+    const qtdEl = document.getElementById('qtd-tarefas');
+    const msgEl = document.getElementById('msg-tarefas');
+    if (qtdEl) qtdEl.textContent = tarefas.length;
+    if (msgEl) msgEl.textContent = tarefas.length === 0 ? 'Tudo concluído. 🎉' : `Existem ${tarefas.length} tarefas por fazer.`;
 }
 
 function addTarefa(e) {
     e.preventDefault();
     const inp = document.getElementById('input-tarefa');
     tarefas.push(inp.value);
-    localStorage.setItem('saints_t', JSON.stringify(tarefas));
+    db.ref('tarefas').set(tarefas);
     inp.value = '';
-    renderTarefas();
 }
 
 function delTarefa(i) {
     tarefas.splice(i, 1);
-    localStorage.setItem('saints_t', JSON.stringify(tarefas));
-    renderTarefas();
+    db.ref('tarefas').set(tarefas);
 }
 
-// SELECT DE PRODUTOS
+// SELECTS DINÂMICOS
 function atualizarSelectProdutos() {
     const select = document.getElementById('pedido-produto-select');
-    const produtos = JSON.parse(localStorage.getItem('saints_produtos')) || [];
+    if (!select) return;
+    const produtos = dadosGlobais['produtos'] || [];
 
     select.innerHTML = '<option value="">-- Seleciona um produto registrado --</option>';
     produtos.forEach((p, idx) => {
@@ -83,10 +125,10 @@ function atualizarSelectProdutos() {
     });
 }
 
-// SELECT DE ARMAS
 function atualizarSelectArmas() {
     const select = document.getElementById('enc-arma-select');
-    const armas = JSON.parse(localStorage.getItem('saints_armas')) || [];
+    if (!select) return;
+    const armas = dadosGlobais['armas'] || [];
 
     select.innerHTML = '<option value="">-- Seleciona uma Arma / Munição cadastrada --</option>';
     armas.forEach((a, idx) => {
@@ -95,7 +137,7 @@ function atualizarSelectArmas() {
     });
 }
 
-// ABA PEDIDOS CLIENTES
+// PEDIDOS CLIENTES
 function addPedidoCliente(e) {
     e.preventDefault();
     const cliente = document.getElementById('pedido-cliente').value.trim();
@@ -108,28 +150,24 @@ function addPedidoCliente(e) {
         return;
     }
 
-    const produtos = JSON.parse(localStorage.getItem('saints_produtos')) || [];
+    const produtos = dadosGlobais['produtos'] || [];
     const produtoSel = produtos[prodIndex];
     const precoUnitario = parseFloat(produtoSel.detalhes) || 0;
     const total = precoUnitario * qtd;
 
-    const pedidos = JSON.parse(localStorage.getItem('saints_pedidos_clientes')) || [];
-    pedidos.push({ cliente, empresa, item: produtoSel.nome, qtd, precoUnitario, total });
-
-    localStorage.setItem('saints_pedidos_clientes', JSON.stringify(pedidos));
+    pedidosClientes.push({ cliente, empresa, item: produtoSel.nome, qtd, precoUnitario, total });
+    db.ref('pedidos_clientes').set(pedidosClientes);
     e.target.reset();
-    carregarPedidosClientes();
 }
 
 function carregarPedidosClientes() {
-    const pedidos = JSON.parse(localStorage.getItem('saints_pedidos_clientes')) || [];
     const container = document.getElementById('grid-pedidos-clientes');
     if (!container) return;
 
     let totalGeral = 0;
     container.innerHTML = '';
 
-    pedidos.forEach((item, index) => {
+    pedidosClientes.forEach((item, index) => {
         totalGeral += item.total;
         container.innerHTML += `
             <div class="item-card fatura-card">
@@ -143,19 +181,16 @@ function carregarPedidosClientes() {
         `;
     });
 
-    // Atualiza o total de Pedidos Clientes na Visão Geral
     const elTotal = document.getElementById('qtd-pedidos-clientes');
     if (elTotal) elTotal.textContent = `${totalGeral.toFixed(2)} €`;
 }
 
 function removerPedidoCliente(index) {
-    const pedidos = JSON.parse(localStorage.getItem('saints_pedidos_clientes')) || [];
-    pedidos.splice(index, 1);
-    localStorage.setItem('saints_pedidos_clientes', JSON.stringify(pedidos));
-    carregarPedidosClientes();
+    pedidosClientes.splice(index, 1);
+    db.ref('pedidos_clientes').set(pedidosClientes);
 }
 
-// ABA ENCOMENDAS PEDIDAS (INTEGRADA COM ARMAS)
+// ENCOMENDAS PEDIDAS
 function addEncomendaArma(e) {
     e.preventDefault();
     const comprador = document.getElementById('enc-comprador').value.trim();
@@ -168,28 +203,24 @@ function addEncomendaArma(e) {
         return;
     }
 
-    const armas = JSON.parse(localStorage.getItem('saints_armas')) || [];
+    const armas = dadosGlobais['armas'] || [];
     const armaSel = armas[armaIndex];
     const precoUnitario = parseFloat(armaSel.detalhes) || 0;
     const total = precoUnitario * qtd;
 
-    const encomendas = JSON.parse(localStorage.getItem('saints_encomendas_pedidas')) || [];
-    encomendas.push({ comprador, fornecedor, item: armaSel.nome, qtd, precoUnitario, total });
-
-    localStorage.setItem('saints_encomendas_pedidas', JSON.stringify(encomendas));
+    encomendasPedidas.push({ comprador, fornecedor, item: armaSel.nome, qtd, precoUnitario, total });
+    db.ref('encomendas_pedidas').set(encomendasPedidas);
     e.target.reset();
-    carregarEncomendasPedidas();
 }
 
 function carregarEncomendasPedidas() {
-    const encomendas = JSON.parse(localStorage.getItem('saints_encomendas_pedidas')) || [];
     const container = document.getElementById('grid-encomendas-pedidas');
     if (!container) return;
 
     let totalGeral = 0;
     container.innerHTML = '';
 
-    encomendas.forEach((item, index) => {
+    encomendasPedidas.forEach((item, index) => {
         totalGeral += item.total;
         container.innerHTML += `
             <div class="item-card encomenda-card">
@@ -203,23 +234,18 @@ function carregarEncomendasPedidas() {
         `;
     });
 
-    // Atualiza o total de Encomendas Pedidas na Visão Geral
     const elTotal = document.getElementById('qtd-encomendas');
     if (elTotal) elTotal.textContent = `${totalGeral.toFixed(2)} €`;
 }
 
 function removerEncomendaPedida(index) {
-    const encomendas = JSON.parse(localStorage.getItem('saints_encomendas_pedidas')) || [];
-    encomendas.splice(index, 1);
-    localStorage.setItem('saints_encomendas_pedidas', JSON.stringify(encomendas));
-    carregarEncomendasPedidas();
+    encomendasPedidas.splice(index, 1);
+    db.ref('encomendas_pedidas').set(encomendasPedidas);
 }
 
-// GESTÃO DINÂMICA DE OUTRAS ABAS
-const abasComCards = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa'];
-
+// OUTRAS ABAS (CARDS)
 function carregarCards(categoria) {
-    const dados = JSON.parse(localStorage.getItem(`saints_${categoria}`)) || [];
+    const dados = dadosGlobais[categoria] || [];
     const container = document.getElementById(`grid-${categoria}`);
     if (!container) return;
 
@@ -253,27 +279,15 @@ function addCardData(e, categoria) {
     const imagem = document.getElementById(`${categoria}-imagem`) ? document.getElementById(`${categoria}-imagem`).value.trim() : '';
     const link = document.getElementById(`${categoria}-link`) ? document.getElementById(`${categoria}-link`).value.trim() : '';
 
-    const dados = JSON.parse(localStorage.getItem(`saints_${categoria}`)) || [];
+    const dados = dadosGlobais[categoria] || [];
     dados.push({ nome, detalhes, imagem, link });
-    localStorage.setItem(`saints_${categoria}`, JSON.stringify(dados));
-
+    
+    db.ref(`categoria_${categoria}`).set(dados);
     e.target.reset();
-    carregarCards(categoria);
-    if (categoria === 'produtos') atualizarSelectProdutos();
-    if (categoria === 'armas') atualizarSelectArmas();
 }
 
 function removerCardData(categoria, index) {
-    const dados = JSON.parse(localStorage.getItem(`saints_${categoria}`)) || [];
+    const dados = dadosGlobais[categoria] || [];
     dados.splice(index, 1);
-    localStorage.setItem(`saints_${categoria}`, JSON.stringify(dados));
-    carregarCards(categoria);
-    if (categoria === 'produtos') atualizarSelectProdutos();
-    if (categoria === 'armas') atualizarSelectArmas();
+    db.ref(`categoria_${categoria}`).set(dados);
 }
-
-// INICIA E CARREGA TODOS OS DADOS
-renderTarefas();
-carregarPedidosClientes();
-carregarEncomendasPedidas();
-abasComCards.forEach(cat => carregarCards(cat));
