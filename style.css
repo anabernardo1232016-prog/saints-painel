@@ -1,93 +1,126 @@
+/* =========================================================
+   ESTILO SAINTS: PEAKY BLINDERS INDUSTRIAL VINTAGE
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+    --bg-fundo: #0a0a09;             /* Preto fuligem industrial */
+    --bg-painel: #121210;            /* Couro escuro / Madeira tratada */
+    --bg-card: #191816;              /* Cartão papel vintage escuro */
+    --borda-ferro: #2a2824;          /* Ferro fundido */
+    
+    --bronze-peaky: #a3824b;         /* Dourado/Bronze envelhecido e baço */
+    --bronze-destaque: #c29d5d;      /* Bronze para hover */
+    
+    --texto-papel: #d1c7b7;          /* Branco pergamimho antigo */
+    --texto-apagado: #7a7367;        /* Cinza fumado */
+    --vermelho-sangue: #7a1f1f;      /* Vermelho vintage para apagar */
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Courier Prime', monospace;
 }
 
 body {
-    background-color: #050404;
-    color: #d8c8b8;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
+    background-color: var(--bg-fundo);
+    background-image: radial-gradient(#1c1a16 1px, transparent 1px);
+    background-size: 16px 16px;
+    color: var(--texto-papel);
+    font-family: 'Courier Prime', Georgia, serif;
+    font-size: 13px;
+    padding: 15px;
+    line-height: 1.35;
 }
 
+/* CONTAINER PRINCIPAL ESTILO GABINETE SHELBY */
 .container {
-    width: 100%;
-    max-width: 950px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background-color: var(--bg-painel);
+    border: 2px solid var(--borda-ferro);
+    outline: 1px solid var(--bronze-peaky);
+    outline-offset: -5px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
 }
 
-/* CABEÇALHO */
+/* CABEÇALHO CLÁSSICO DE JORNAL / GABINETE */
 header {
     text-align: center;
-    margin-bottom: 25px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--bronze-peaky);
+    margin-bottom: 15px;
 }
 
 header h1 {
+    font-family: 'Cinzel', 'Courier Prime', serif;
     font-size: 2.8rem;
-    letter-spacing: 12px;
-    color: #f2e3d5;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--bronze-peaky);
     text-transform: uppercase;
-    font-weight: 700;
+    text-shadow: 2px 2px 5px #000;
 }
 
 header p {
-    color: #8c7b6c;
-    font-size: 0.85rem;
-    letter-spacing: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--texto-apagado);
     text-transform: uppercase;
-    margin-top: 8px;
+    letter-spacing: 3px;
+    margin-top: -4px;
 }
 
-hr.linha-divisoria {
-    border: 0;
-    height: 1px;
-    background: #231c17;
-    margin-bottom: 25px;
+.linha-divisoria {
+    display: none;
 }
 
-/* NAVEGAÇÃO */
+/* NAVEGAÇÃO COMPACTA & ESTRUTURADA */
 nav {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 35px;
+    gap: 5px;
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border: 1px solid var(--borda-ferro);
 }
 
 .nav-linha {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
+    flex-wrap: wrap;
 }
 
 .btn-nav {
-    background-color: #120e0c;
-    border: 1px solid #2b221b;
-    color: #b5a494;
-    padding: 8px 14px;
-    font-size: 0.82rem;
+    background: #0d0c0b;
+    color: var(--texto-apagado);
+    border: 1px solid var(--borda-ferro);
+    padding: 5px 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     transition: all 0.2s ease;
 }
 
 .btn-nav:hover {
-    border-color: #44352b;
-    color: #e6dfcc;
+    background: var(--borda-ferro);
+    color: var(--bronze-peaky);
+    border-color: var(--bronze-peaky);
 }
 
 .btn-nav.ativo {
-    background-color: #2b241d;
-    border-color: #4a3e33;
-    color: #ffffff;
+    background: var(--bronze-peaky);
+    color: #0a0a09;
+    border-color: var(--bronze-destaque);
+    box-shadow: 0 0 10px rgba(163, 130, 75, 0.3);
 }
 
 /* CONTEÚDO DAS ABAS */
@@ -99,227 +132,243 @@ nav {
     display: block;
 }
 
-/* CARDS E GRIDS DA VISÃO GERAL */
+/* PAINÉIS LATERAIS & BLOCOS */
+.card-longo {
+    background: var(--bg-card);
+    border: 1px solid var(--borda-ferro);
+    border-left: 3px solid var(--bronze-peaky);
+    padding: 14px;
+    margin-bottom: 15px;
+}
+
+.card-longo h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--bronze-peaky);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--borda-ferro);
+    padding-bottom: 5px;
+}
+
+/* ABA INÍCIO & VISÃO GERAL */
 .badge-bemvindo {
     display: inline-block;
-    background-color: #5c2323;
-    color: #ff9999;
-    font-size: 0.65rem;
+    background: var(--bronze-peaky);
+    color: #0a0a09;
+    font-family: 'Cinzel', serif;
     padding: 2px 6px;
-    letter-spacing: 1px;
+    font-size: 0.7rem;
     font-weight: bold;
     text-transform: uppercase;
-    border-radius: 2px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .header-visao {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 5px;
-}
-
-.header-visao h2 {
-    font-size: 1.6rem;
-    color: #ffffff;
-    font-weight: bold;
+    align-items: center;
 }
 
 .relogio {
-    font-size: 0.9rem;
-    color: #a89888;
+    font-family: 'Courier Prime', monospace;
+    font-size: 1.4rem;
+    color: var(--bronze-destaque);
+    font-weight: bold;
+    letter-spacing: 2px;
 }
 
 .data-atual {
-    color: #706256;
-    font-size: 0.85rem;
-    margin-bottom: 25px;
+    color: var(--texto-apagado);
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    font-style: italic;
 }
 
 .grid-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-@media (max-width: 768px) {
-    .grid-cards {
-        grid-template-columns: 1fr;
-    }
-}
-
-.card {
-    background-color: #0c0a09;
-    border: 1px solid #1c1612;
-    border-radius: 6px;
-    padding: 18px 20px;
-}
-
-.card .titulo {
-    color: #948474;
-    font-size: 0.8rem;
-    margin-bottom: 12px;
-}
-
-.card .valor-verde {
-    color: #00ff66;
-    font-size: 1.4rem;
-    font-weight: bold;
-}
-
-.card-longo {
-    background-color: #0c0a09;
-    border: 1px solid #1c1612;
-    border-radius: 6px;
-    padding: 18px 20px;
-}
-
-.card-longo h3 {
-    color: #ffffff;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 10px;
     margin-bottom: 15px;
 }
 
-/* FORMULÁRIOS DINÂMICOS */
+.card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--borda-ferro);
+    padding: 10px;
+    text-align: center;
+}
+
+.card .titulo {
+    font-size: 0.75rem;
+    color: var(--texto-apagado);
+    text-transform: uppercase;
+    font-family: 'Cinzel', serif;
+}
+
+.card .valor-verde {
+    font-size: 1.3rem;
+    color: var(--bronze-destaque);
+    font-weight: bold;
+    margin-top: 3px;
+}
+
+/* FORMULÁRIOS COMPACTOS */
 .form-simples, .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border: 1px solid var(--borda-ferro);
 }
 
-input, select {
-    background: #120e0c;
-    border: 1px solid #2b221b;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 4px;
+input, select, textarea {
+    background: #080807 !important;
+    color: var(--texto-papel) !important;
+    border: 1px solid var(--borda-ferro) !important;
+    padding: 6px 8px !important;
+    font-family: 'Courier Prime', monospace !important;
+    font-size: 0.8rem !important;
+    border-radius: 0px !important;
+}
+
+input:focus, select:focus, textarea:focus {
     outline: none;
-    font-size: 0.85rem;
+    border-color: var(--bronze-peaky) !important;
 }
 
-input:focus, select:focus {
-    border-color: #4a3e33;
-}
-
-button.btn-add {
-    background: #2b241d;
-    border: 1px solid #4a3e33;
-    color: #fff;
-    padding: 8px 15px;
+.btn-add {
+    background: var(--bronze-peaky);
+    color: #0a0a09;
+    border: none;
+    padding: 6px 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
     cursor: pointer;
-    border-radius: 4px;
-    font-weight: bold;
+    transition: 0.2s;
 }
 
-button.btn-add:hover {
-    background: #3b3229;
+.btn-add:hover {
+    background: var(--bronze-destaque);
 }
 
-/* LISTAGEM EM CARDS DINÂMICOS */
+/* TABELAS COMPACTAS DE TAREFAS */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+
+th, td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--borda-ferro);
+    text-align: left;
+    font-size: 0.8rem;
+}
+
+th {
+    font-family: 'Cinzel', serif;
+    color: var(--bronze-peaky);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+.btn-apagar {
+    background: transparent;
+    color: var(--vermelho-sangue);
+    border: 1px solid var(--vermelho-sangue);
+    padding: 1px 5px;
+    cursor: pointer;
+    font-size: 0.7rem;
+}
+
+.btn-apagar:hover {
+    background: var(--vermelho-sangue);
+    color: #fff;
+}
+
+/* GRELHA DE CARDS ULTRA COMPACTA */
 .cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .item-card {
-    background: #120e0c;
-    border: 1px solid #2b221b;
-    border-radius: 4px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     position: relative;
+    background: #0e0d0c;
+    border: 1px solid var(--borda-ferro);
+    padding: 8px;
+    font-size: 0.8rem;
 }
 
-.item-card.fatura-card {
-    border-left: 3px solid #00ff66;
+.item-card h4 {
+    font-family: 'Cinzel', serif;
+    color: var(--bronze-peaky);
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    padding-right: 18px;
 }
 
-.item-card.encomenda-card {
-    border-left: 3px solid #ffaa00;
+.item-card p {
+    color: var(--texto-papel);
+    margin-bottom: 3px;
+    word-break: break-word;
 }
 
 .item-card img {
     width: 100%;
-    height: 140px;
+    max-height: 95px;
     object-fit: cover;
-    border-radius: 3px;
-    border: 1px solid #231c17;
-}
-
-.item-card h4 {
-    color: #f2e3d5;
-    font-size: 0.95rem;
-}
-
-.item-card p {
-    color: #b5a494;
-    font-size: 0.8rem;
-    line-height: 1.3;
-}
-
-.item-card .sub-info {
-    font-size: 0.75rem;
-    color: #706256;
-}
-
-.item-card .total-destaque {
-    color: #00ff66;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-top: 4px;
+    border: 1px solid var(--borda-ferro);
+    margin-bottom: 5px;
+    filter: sepia(35%) contrast(110%);
 }
 
 .item-card a {
-    color: #00ff66;
-    font-size: 0.75rem;
+    display: inline-block;
+    color: var(--bronze-destaque);
+    text-decoration: none;
+    font-size: 0.72rem;
+    margin-top: 2px;
+}
+
+.item-card a:hover {
     text-decoration: underline;
-    word-break: break-all;
+}
+
+.item-card .sub-info {
+    font-size: 0.72rem;
+    color: var(--texto-apagado);
+}
+
+.item-card .total-destaque {
+    font-weight: bold;
+    color: var(--bronze-destaque);
+    margin-top: 4px;
+    font-size: 0.82rem;
+    border-top: 1px dashed var(--borda-ferro);
+    padding-top: 3px;
 }
 
 .btn-apagar-card {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    border: none;
-    color: #ff4d4d;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-weight: bold;
-}
-
-/* TABELA DA ABA TAREFAS */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
-
-th, td {
-    text-align: left;
-    padding: 8px;
-    border-bottom: 1px solid #1c1612;
-}
-
-th {
-    color: #948474;
-}
-
-.btn-apagar {
+    top: 5px;
+    right: 5px;
     background: none;
     border: none;
-    color: #ff4d4d;
+    color: var(--texto-apagado);
+    font-size: 0.8rem;
     cursor: pointer;
-    font-size: 1rem;
+}
+
+.btn-apagar-card:hover {
+    color: var(--vermelho-sangue);
 }
