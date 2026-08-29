@@ -14,12 +14,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa'];
+const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
 
 let dadosGlobais = {};
 let tarefas = [];
 let pedidosClientes = [];
 let encomendasPedidas = [];
+let reunioes = [];
+let faltas = [];
+let avisos = [];
 
 // ESCUTAR NUVEM (TEMPO REAL)
 db.ref('tarefas').on('value', (snapshot) => {
@@ -35,6 +38,21 @@ db.ref('pedidos_clientes').on('value', (snapshot) => {
 db.ref('encomendas_pedidas').on('value', (snapshot) => {
     encomendasPedidas = snapshot.val() || [];
     carregarEncomendasPedidas();
+});
+
+db.ref('reunioes').on('value', (snapshot) => {
+    reunioes = snapshot.val() || [];
+    carregarReunioes();
+});
+
+db.ref('faltas').on('value', (snapshot) => {
+    faltas = snapshot.val() || [];
+    carregarFaltas();
+});
+
+db.ref('avisos').on('value', (snapshot) => {
+    avisos = snapshot.val() || [];
+    carregarAvisos();
 });
 
 categorias.forEach(cat => {
@@ -236,7 +254,103 @@ function removerEncomendaPedida(index) {
     db.ref('encomendas_pedidas').set(encomendasPedidas);
 }
 
-// OUTROS CARDS
+// LÓGICA DE REUNIÕES, FALTAS E AVISOS
+function addReuniao(e) {
+    e.preventDefault();
+    const motivo = document.getElementById('reuniao-motivo').value.trim();
+    const horas = document.getElementById('reuniao-horas').value;
+    const assunto = document.getElementById('reuniao-assunto').value.trim();
+
+    reunioes.push({ motivo, horas, assunto });
+    db.ref('reunioes').set(reunioes);
+    e.target.reset();
+}
+
+function carregarReunioes() {
+    const container = document.getElementById('grid-reunioes');
+    if (!container) return;
+    container.innerHTML = '';
+
+    reunioes.forEach((r, idx) => {
+        container.innerHTML += `
+            <div class="item-card">
+                <button class="btn-apagar-card" onclick="removerReuniao(${idx})">✕</button>
+                <h4>🗣️ ${r.motivo}</h4>
+                <div class="sub-info">⏰ Horário: <strong>${r.horas}</strong></div>
+                <p style="margin-top: 8px;">📜 <strong>Assunto:</strong> ${r.assunto}</p>
+            </div>
+        `;
+    });
+}
+
+function removerReuniao(index) {
+    reunioes.splice(index, 1);
+    db.ref('reunioes').set(reunioes);
+}
+
+function addFalta(e) {
+    e.preventDefault();
+    const nome = document.getElementById('falta-nome').value.trim();
+    const motivo = document.getElementById('falta-motivo').value.trim() || 'Sem justificativa';
+
+    faltas.push({ nome, motivo });
+    db.ref('faltas').set(faltas);
+    e.target.reset();
+}
+
+function carregarFaltas() {
+    const container = document.getElementById('grid-faltas');
+    if (!container) return;
+    container.innerHTML = '';
+
+    faltas.forEach((f, idx) => {
+        container.innerHTML += `
+            <div class="item-card" style="border-left: 4px solid #ff4d4d;">
+                <button class="btn-apagar-card" onclick="removerFalta(${idx})">✕</button>
+                <h4>🚫 ${f.nome}</h4>
+                <p style="margin-top: 6px; font-size: 0.9em; opacity: 0.8;">Motivo: ${f.motivo}</p>
+            </div>
+        `;
+    });
+}
+
+function removerFalta(index) {
+    faltas.splice(index, 1);
+    db.ref('faltas').set(faltas);
+}
+
+function addAviso(e) {
+    e.preventDefault();
+    const titulo = document.getElementById('aviso-titulo').value.trim();
+    const texto = document.getElementById('aviso-texto').value.trim();
+
+    avisos.push({ titulo, texto });
+    db.ref('avisos').set(avisos);
+    e.target.reset();
+}
+
+function carregarAvisos() {
+    const container = document.getElementById('grid-avisos');
+    if (!container) return;
+    container.innerHTML = '';
+
+    avisos.forEach((a, idx) => {
+        container.innerHTML += `
+            <div class="item-card" style="border-left: 4px solid #ffcc00;">
+                <button class="btn-apagar-card" onclick="removerAviso(${idx})">✕</button>
+                <h4>⚠️ ${a.titulo}</h4>
+                <p style="margin-top: 6px;">${a.texto}</p>
+            </div>
+        `;
+    });
+}
+
+function removerAviso(index) {
+    avisos.splice(index, 1);
+    db.ref('avisos').set(avisos);
+}
+
+// OUTROS CARDS (Geral/Parcerias)
 function carregarCards(categoria) {
     const dados = dadosGlobais[categoria] || [];
     const container = document.getElementById(`grid-${categoria}`);
