@@ -38,6 +38,8 @@
                 <button class="btn-nav" onclick="mudarAba('craft-saints', this)"><span>⚜️</span> Craft SAINTS</button>
                 <button class="btn-nav" onclick="mudarAba('receitas', this)"><span>📜</span> Receitas</button>
                 <button class="btn-nav" onclick="mudarAba('roupa', this)"><span>👔</span> Roupa</button>
+                <button class="btn-nav" onclick="mudarAba('parcerias', this)"><span>🤝</span> Parcerias</button>
+                <button class="btn-nav" onclick="mudarAba('reuniao', this)"><span>🗣️</span> Reunião</button>
             </div>
         </nav>
 
@@ -253,6 +255,58 @@
                     <button class="btn-add" type="submit">Registar Outfit</button>
                 </form>
                 <div class="cards-container" id="grid-roupa"></div>
+            </div>
+        </div>
+
+        <!-- ABA PARCERIAS -->
+        <div id="aba-parcerias" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>🤝 Parcerias</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'parcerias')">
+                    <input type="text" id="parcerias-nome" placeholder="Nome da Parceria / Grupo" required>
+                    <input type="text" id="parcerias-detalhes" placeholder="Termos / Acordo da Parceria" required>
+                    <input type="url" id="parcerias-imagem" placeholder="URL do Logo / Imagem">
+                    <input type="url" id="parcerias-link" placeholder="URL do Documento / Contacto">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Parceria</button>
+                </form>
+                <div class="cards-container" id="grid-parcerias"></div>
+            </div>
+        </div>
+
+        <!-- ABA REUNIÃO -->
+        <div id="aba-reuniao" class="aba-conteudo">
+            <!-- MARCAR REUNIÃO -->
+            <div class="card-longo">
+                <h3>🗣️ Marcar / Registo de Reunião</h3>
+                <form class="form-grid" onsubmit="addReuniao(event)">
+                    <input type="text" id="reuniao-motivo" placeholder="Motivo da Reunião" required>
+                    <input type="time" id="reuniao-horas" required>
+                    <textarea id="reuniao-assunto" placeholder="Assunto / Pauta a discutir" rows="3" required style="grid-column: span 2; padding: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-family: inherit;"></textarea>
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Reunião</button>
+                </form>
+                <div class="cards-container" id="grid-reunioes"></div>
+            </div>
+
+            <!-- REGISTO DE FALTAS -->
+            <div class="card-longo" style="margin-top: 25px;">
+                <h3>🚫 Quem Não Foi (Faltas)</h3>
+                <form class="form-grid" onsubmit="addFalta(event)">
+                    <input type="text" id="falta-nome" placeholder="Nome do Membro" required>
+                    <input type="text" id="falta-motivo" placeholder="Motivo da Falta (opcional)">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Falta</button>
+                </form>
+                <div class="cards-container" id="grid-faltas"></div>
+            </div>
+
+            <!-- AVISOS DA REUNIÃO -->
+            <div class="card-longo" style="margin-top: 25px;">
+                <h3>⚠️ Avisos Importantes</h3>
+                <form class="form-grid" onsubmit="addAviso(event)">
+                    <input type="text" id="aviso-titulo" placeholder="Título do Aviso" required>
+                    <textarea id="aviso-texto" placeholder="Mensagem / Detalhes do Aviso" rows="2" required style="grid-column: span 2; padding: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-family: inherit;"></textarea>
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Publicar Aviso</button>
+                </form>
+                <div class="cards-container" id="grid-avisos"></div>
             </div>
         </div>
 
