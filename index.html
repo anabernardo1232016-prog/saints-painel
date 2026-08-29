@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAINTS - "No fim...morremos."</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- CABEÇALHO -->
+        <header>
+            <h1>SAINTS</h1>
+            <p>"No fim...morremos."</p>
+        </header>
+
+        <hr class="linha-divisoria">
+
+        <!-- NAVEGAÇÃO / BOTÕES -->
+        <nav>
+            <div class="nav-linha">
+                <button class="btn-nav ativo" onclick="mudarAba('inicio', this)"><span>🏕️</span> Início</button>
+                <button class="btn-nav" onclick="mudarAba('tarefas', this)"><span>📋</span> Tarefas</button>
+                <button class="btn-nav" onclick="mudarAba('pedidos-clientes', this)"><span>📌</span> Pedidos Clientes</button>
+                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Preços de Produtos</button>
+                <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços de Armas</button>
+            </div>
+            <div class="nav-linha">
+                <button class="btn-nav" onclick="mudarAba('encomendas-pedidas', this)"><span>📦</span> Encomendas Pedidas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-vendas', this)"><span>📍</span> Spots de Vendas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-craft', this)"><span>🔨</span> Spots de Craft</button>
+                <button class="btn-nav" onclick="mudarAba('spots-plantas', this)"><span>🌿</span> Spots de Plantas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-frutas', this)"><span>🍎</span> Spots de Frutas</button>
+            </div>
+            <div class="nav-linha">
+                <button class="btn-nav" onclick="mudarAba('craft-saints', this)"><span>⚜️</span> Craft SAINTS</button>
+                <button class="btn-nav" onclick="mudarAba('receitas', this)"><span>📜</span> Receitas</button>
+                <button class="btn-nav" onclick="mudarAba('roupa', this)"><span>👔</span> Roupa</button>
+            </div>
+        </nav>
+
+        <!-- ABA INÍCIO -->
+        <div id="aba-inicio" class="aba-conteudo ativa">
+            <span class="badge-bemvindo">Bem-Vindo</span>
+            
+            <div class="header-visao">
+                <h2>Visão Geral</h2>
+                <div class="relogio" id="relogio">00:00:00</div>
+            </div>
+            
+            <div class="data-atual" id="data-extenso">sábado, 29 de agosto de 2026</div>
+
+            <div class="grid-cards">
+                <div class="card">
+                    <div class="titulo">Tarefas Pendentes</div>
+                    <div class="valor-verde" id="qtd-tarefas">0</div>
+                </div>
+                <div class="card">
+                    <div class="titulo">Encomendas Pedidas</div>
+                    <div class="valor-verde" id="qtd-encomendas">0.00 €</div>
+                </div>
+                <div class="card">
+                    <div class="titulo">Pedidos Clientes</div>
+                    <div class="valor-verde" id="qtd-pedidos-clientes">0.00 €</div>
+                </div>
+            </div>
+
+            <div class="card-longo">
+                <h3><span>📋</span> Próximas Tarefas</h3>
+                <p id="msg-tarefas">Tudo concluído. 🎉</p>
+            </div>
+        </div>
+
+        <!-- ABA TAREFAS -->
+        <div id="aba-tarefas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>📋 Gestão de Tarefas</h3>
+                <form class="form-simples" onsubmit="addTarefa(event)">
+                    <input type="text" id="input-tarefa" placeholder="Nova tarefa..." required>
+                    <button class="btn-add" type="submit">Adicionar</button>
+                </form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-tarefas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA PEDIDOS CLIENTES -->
+        <div id="aba-pedidos-clientes" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>📌 Pedidos Clientes</h3>
+                <form class="form-grid" onsubmit="addPedidoCliente(event)">
+                    <input type="text" id="pedido-cliente" placeholder="Nome do Cliente" required>
+                    <input type="text" id="pedido-empresa" placeholder="Correio / Empresa" required>
+                    
+                    <select id="pedido-produto-select" required style="grid-column: span 2;">
+                        <option value="">-- Seleciona um produto registrado --</option>
+                    </select>
+
+                    <input type="number" id="pedido-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Emite Fatura / Registar Pedido</button>
+                </form>
+
+                <div class="cards-container" id="grid-pedidos-clientes"></div>
+            </div>
+        </div>
+
+        <!-- ABA PREÇOS DE PRODUTOS -->
+        <div id="aba-precos-produtos" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>💰 Preços de Produtos</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'produtos')">
+                    <input type="text" id="produtos-nome" placeholder="Nome do Produto / Item" required>
+                    <input type="number" step="0.01" id="produtos-detalhes" placeholder="Preço Unitário (€)" required>
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Produto</button>
+                </form>
+                <div class="cards-container" id="grid-produtos"></div>
+            </div>
+        </div>
+
+        <!-- ABA PREÇOS DE ARMAS -->
+        <div id="aba-precos-armas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>⚔️ Preços de Armas</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'armas')">
+                    <input type="text" id="armas-nome" placeholder="Nome da Arma / Munição" required>
+                    <input type="number" step="0.01" id="armas-detalhes" placeholder="Preço Unitário (€)" required>
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Arma / Munição</button>
+                </form>
+                <div class="cards-container" id="grid-armas"></div>
+            </div>
+        </div>
+
+        <!-- ABA ENCOMENDAS PEDIDAS -->
+        <div id="aba-encomendas-pedidas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>📦 Encomendas Pedidas</h3>
+                <form class="form-grid" onsubmit="addEncomendaArma(event)">
+                    <input type="text" id="enc-comprador" placeholder="Nome do Comprador / Membro" required>
+                    <input type="text" id="enc-fornecedor" placeholder="Fornecedor / Origem" required>
+                    
+                    <select id="enc-arma-select" required style="grid-column: span 2;">
+                        <option value="">-- Seleciona uma Arma / Munição cadastrada --</option>
+                    </select>
+
+                    <input type="number" id="enc-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Encomenda</button>
+                </form>
+
+                <div class="cards-container" id="grid-encomendas-pedidas"></div>
+            </div>
+        </div>
+
+        <!-- ABA SPOTS DE VENDAS -->
+        <div id="aba-spots-vendas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>📍 Spots de Vendas</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'vendas')">
+                    <input type="text" id="vendas-nome" placeholder="Nome do Local" required>
+                    <input type="text" id="vendas-detalhes" placeholder="O que se vende aqui?" required>
+                    <input type="url" id="vendas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="vendas-link" placeholder="URL do Link / Mapa">
+                    <button class="btn-add" type="submit">Guardar Spot</button>
+                </form>
+                <div class="cards-container" id="grid-vendas"></div>
+            </div>
+        </div>
+
+        <!-- ABA SPOTS DE PLANTAS -->
+        <div id="aba-spots-plantas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>🌿 Spots de Plantas</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'plantas')">
+                    <input type="text" id="plantas-nome" placeholder="Nome do Local" required>
+                    <input type="text" id="plantas-detalhes" placeholder="O que se colhe aqui?" required>
+                    <input type="url" id="plantas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="plantas-link" placeholder="URL do Link / Mapa">
+                    <button class="btn-add" type="submit">Guardar Spot</button>
+                </form>
+                <div class="cards-container" id="grid-plantas"></div>
+            </div>
+        </div>
+
+        <!-- ABA SPOTS DE FRUTAS -->
+        <div id="aba-spots-frutas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>🍎 Spots de Frutas</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'frutas')">
+                    <input type="text" id="frutas-nome" placeholder="Nome do Local" required>
+                    <input type="text" id="frutas-detalhes" placeholder="O que se colhe aqui?" required>
+                    <input type="url" id="frutas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="frutas-link" placeholder="URL do Link / Mapa">
+                    <button class="btn-add" type="submit">Guardar Spot</button>
+                </form>
+                <div class="cards-container" id="grid-frutas"></div>
+            </div>
+        </div>
+
+        <!-- ABA SPOTS DE CRAFT -->
+        <div id="aba-spots-craft" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>🔨 Spots de Craft</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'craft')">
+                    <input type="text" id="craft-nome" placeholder="Nome do Local" required>
+                    <input type="text" id="craft-detalhes" placeholder="O que tem lá / O que se produz?" required>
+                    <input type="url" id="craft-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="craft-link" placeholder="URL do Link / Mapa">
+                    <button class="btn-add" type="submit">Guardar Spot</button>
+                </form>
+                <div class="cards-container" id="grid-craft"></div>
+            </div>
+        </div>
+
+        <!-- ABA CRAFT SAINTS -->
+        <div id="aba-craft-saints" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>⚜️ Craft SAINTS</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'craft-saints')">
+                    <input type="text" id="craft-saints-nome" placeholder="Item SAINTS" required>
+                    <input type="text" id="craft-saints-detalhes" placeholder="Ingredientes / Materiais" required>
+                    <input type="url" id="craft-saints-imagem" placeholder="URL da Imagem">
+                    <input type="url" id="craft-saints-link" placeholder="URL do Link">
+                    <button class="btn-add" type="submit">Registar Craft</button>
+                </form>
+                <div class="cards-container" id="grid-craft-saints"></div>
+            </div>
+        </div>
+
+        <!-- ABA RECEITAS -->
+        <div id="aba-receitas" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>📜 Receitas</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'receitas')">
+                    <input type="text" id="receitas-nome" placeholder="Nome da Receita" required>
+                    <input type="text" id="receitas-detalhes" placeholder="Ingredientes necessários" required>
+                    <input type="url" id="receitas-imagem" placeholder="URL da Imagem">
+                    <input type="url" id="receitas-link" placeholder="URL do Link">
+                    <button class="btn-add" type="submit">Registar Receita</button>
+                </form>
+                <div class="cards-container" id="grid-receitas"></div>
+            </div>
+        </div>
+
+        <!-- ABA ROUPA -->
+        <div id="aba-roupa" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>👔 Roupa</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'roupa')">
+                    <input type="text" id="roupa-nome" placeholder="Nome do Outfit / Peça" required>
+                    <input type="text" id="roupa-detalhes" placeholder="Códigos / Peças de Roupa" required>
+                    <input type="url" id="roupa-imagem" placeholder="URL da Foto do Outfit">
+                    <input type="url" id="roupa-link" placeholder="URL do Link">
+                    <button class="btn-add" type="submit">Registar Outfit</button>
+                </form>
+                <div class="cards-container" id="grid-roupa"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ... resto do teu HTML ... -->
+
+    <!-- SCRIPTS DO FIREBASE (Adicionar aqui) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Teu script original -->
+    <script src="script.js"></script>
+</body>
+</html>
