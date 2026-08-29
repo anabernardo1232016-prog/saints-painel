@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAINTS - Painel de Logística e Organização</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,23 +16,21 @@
             <p>Painel de Logística e Organização</p>
         </header>
 
-        <hr class="linha-divisoria">
-
         <!-- NAVEGAÇÃO -->
         <nav>
             <div class="nav-linha">
                 <button class="btn-nav ativo" onclick="mudarAba('inicio', this)"><span>🏕️</span> Início</button>
                 <button class="btn-nav" onclick="mudarAba('tarefas', this)"><span>📋</span> Tarefas</button>
                 <button class="btn-nav" onclick="mudarAba('pedidos-clientes', this)"><span>📌</span> Pedidos Clientes</button>
-                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Preços de Produtos</button>
-                <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços de Armas</button>
+                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Preços Produtos</button>
+                <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços Armas</button>
             </div>
             <div class="nav-linha">
-                <button class="btn-nav" onclick="mudarAba('encomendas-pedidas', this)"><span>📦</span> Encomendas Pedidas</button>
-                <button class="btn-nav" onclick="mudarAba('spots-vendas', this)"><span>📍</span> Spots de Vendas</button>
-                <button class="btn-nav" onclick="mudarAba('spots-craft', this)"><span>🔨</span> Spots de Craft</button>
-                <button class="btn-nav" onclick="mudarAba('spots-plantas', this)"><span>🌿</span> Spots de Plantas</button>
-                <button class="btn-nav" onclick="mudarAba('spots-frutas', this)"><span>🍎</span> Spots de Frutas</button>
+                <button class="btn-nav" onclick="mudarAba('encomendas-pedidas', this)"><span>📦</span> Encomendas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-vendas', this)"><span>📍</span> Spots Vendas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-craft', this)"><span>🔨</span> Spots Craft</button>
+                <button class="btn-nav" onclick="mudarAba('spots-plantas', this)"><span>🌿</span> Spots Plantas</button>
+                <button class="btn-nav" onclick="mudarAba('spots-frutas', this)"><span>🍎</span> Spots Frutas</button>
             </div>
             <div class="nav-linha">
                 <button class="btn-nav" onclick="mudarAba('craft-saints', this)"><span>⚜️</span> Craft SAINTS</button>
@@ -123,16 +121,17 @@
             </div>
         </div>
 
-        <!-- ABA PREÇOS DE ARMAS -->
+        <!-- ABA PREÇOS DE ARMAS (SEPARADA E COM CAMPO EXTRA) -->
         <div id="aba-precos-armas" class="aba-conteudo">
             <div class="card-longo">
                 <h3>⚔️ Preços de Armas</h3>
-                <form class="form-grid" onsubmit="addCardData(event, 'armas')">
-                    <input type="text" id="armas-nome" placeholder="Nome da Arma / Munição" required>
-                    <input type="number" step="0.01" id="armas-detalhes" placeholder="Preço Unitário (€)" required>
+                <form class="form-grid" onsubmit="addArma(event)">
+                    <input type="text" id="arma-nome" placeholder="Nome da Arma / Munição" required>
+                    <input type="number" step="0.01" id="arma-custo" placeholder="Preço de Custo (€)" required>
+                    <input type="number" step="0.01" id="arma-venda" placeholder="Preço de Venda (€)" required style="grid-column: span 2;">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Arma / Munição</button>
                 </form>
-                <div class="cards-container" id="grid-armas"></div>
+                <div class="cards-container" id="grid-armas-novo"></div>
             </div>
         </div>
 
@@ -144,7 +143,7 @@
                     <input type="text" id="enc-comprador" placeholder="Nome do Comprador / Membro" required>
                     <input type="text" id="enc-fornecedor" placeholder="Fornecedor / Origem" required>
                     <select id="enc-arma-select" required style="grid-column: span 2;">
-                        <option value="">-- Seleciona uma Arma / Munição cadastrada --</option>
+                        <option value="">-- Seleciona uma Arma cadastrada --</option>
                     </select>
                     <input type="number" id="enc-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Encomenda</button>
@@ -160,7 +159,7 @@
                 <form class="form-grid" onsubmit="addCardData(event, 'vendas')">
                     <input type="text" id="vendas-nome" placeholder="Nome do Local" required>
                     <input type="text" id="vendas-detalhes" placeholder="O que se vende aqui?" required>
-                    <input type="url" id="vendas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="vendas-imagem" placeholder="URL da Imagem">
                     <input type="url" id="vendas-link" placeholder="URL do Link / Mapa">
                     <button class="btn-add" type="submit">Guardar Spot</button>
                 </form>
@@ -175,7 +174,7 @@
                 <form class="form-grid" onsubmit="addCardData(event, 'plantas')">
                     <input type="text" id="plantas-nome" placeholder="Nome do Local" required>
                     <input type="text" id="plantas-detalhes" placeholder="O que se colhe aqui?" required>
-                    <input type="url" id="plantas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="plantas-imagem" placeholder="URL da Imagem">
                     <input type="url" id="plantas-link" placeholder="URL do Link / Mapa">
                     <button class="btn-add" type="submit">Guardar Spot</button>
                 </form>
@@ -190,7 +189,7 @@
                 <form class="form-grid" onsubmit="addCardData(event, 'frutas')">
                     <input type="text" id="frutas-nome" placeholder="Nome do Local" required>
                     <input type="text" id="frutas-detalhes" placeholder="O que se colhe aqui?" required>
-                    <input type="url" id="frutas-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="url" id="frutas-imagem" placeholder="URL da Imagem">
                     <input type="url" id="frutas-link" placeholder="URL do Link / Mapa">
                     <button class="btn-add" type="submit">Guardar Spot</button>
                 </form>
@@ -204,8 +203,8 @@
                 <h3>🔨 Spots de Craft</h3>
                 <form class="form-grid" onsubmit="addCardData(event, 'craft')">
                     <input type="text" id="craft-nome" placeholder="Nome do Local" required>
-                    <input type="text" id="craft-detalhes" placeholder="O que tem lá / O que se produz?" required>
-                    <input type="url" id="craft-imagem" placeholder="URL da Imagem / Foto">
+                    <input type="text" id="craft-detalhes" placeholder="O que se produz?" required>
+                    <input type="url" id="craft-imagem" placeholder="URL da Imagem">
                     <input type="url" id="craft-link" placeholder="URL do Link / Mapa">
                     <button class="btn-add" type="submit">Guardar Spot</button>
                 </form>
@@ -250,7 +249,7 @@
                 <form class="form-grid" onsubmit="addCardData(event, 'roupa')">
                     <input type="text" id="roupa-nome" placeholder="Nome do Outfit / Peça" required>
                     <input type="text" id="roupa-detalhes" placeholder="Códigos / Peças de Roupa" required>
-                    <input type="url" id="roupa-imagem" placeholder="URL da Foto do Outfit">
+                    <input type="url" id="roupa-imagem" placeholder="URL da Foto">
                     <input type="url" id="roupa-link" placeholder="URL do Link">
                     <button class="btn-add" type="submit">Registar Outfit</button>
                 </form>
@@ -264,9 +263,9 @@
                 <h3>🤝 Parcerias</h3>
                 <form class="form-grid" onsubmit="addCardData(event, 'parcerias')">
                     <input type="text" id="parcerias-nome" placeholder="Nome da Parceria / Grupo" required>
-                    <input type="text" id="parcerias-detalhes" placeholder="Termos / Acordo da Parceria" required>
-                    <input type="url" id="parcerias-imagem" placeholder="URL do Logo / Imagem">
-                    <input type="url" id="parcerias-link" placeholder="URL do Documento / Contacto">
+                    <input type="text" id="parcerias-detalhes" placeholder="Termos / Acordo" required>
+                    <input type="url" id="parcerias-imagem" placeholder="URL do Logo">
+                    <input type="url" id="parcerias-link" placeholder="URL do Documento">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Parceria</button>
                 </form>
                 <div class="cards-container" id="grid-parcerias"></div>
@@ -275,20 +274,18 @@
 
         <!-- ABA REUNIÃO -->
         <div id="aba-reuniao" class="aba-conteudo">
-            <!-- MARCAR REUNIÃO -->
             <div class="card-longo">
                 <h3>🗣️ Marcar / Registo de Reunião</h3>
                 <form class="form-grid" onsubmit="addReuniao(event)">
                     <input type="text" id="reuniao-motivo" placeholder="Motivo da Reunião" required>
                     <input type="time" id="reuniao-horas" required>
-                    <textarea id="reuniao-assunto" placeholder="Assunto / Pauta a discutir" rows="3" required style="grid-column: span 2; padding: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-family: inherit;"></textarea>
+                    <textarea id="reuniao-assunto" placeholder="Assunto / Pauta a discutir" rows="3" required style="grid-column: span 2; padding: 6px; background: #080807; color: #d1c7b7; border: 1px solid #2a2824; font-family: inherit;"></textarea>
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Reunião</button>
                 </form>
                 <div class="cards-container" id="grid-reunioes"></div>
             </div>
 
-            <!-- REGISTO DE FALTAS -->
-            <div class="card-longo" style="margin-top: 25px;">
+            <div class="card-longo" style="margin-top: 15px;">
                 <h3>🚫 Quem Não Foi (Faltas)</h3>
                 <form class="form-grid" onsubmit="addFalta(event)">
                     <input type="text" id="falta-nome" placeholder="Nome do Membro" required>
@@ -298,12 +295,11 @@
                 <div class="cards-container" id="grid-faltas"></div>
             </div>
 
-            <!-- AVISOS DA REUNIÃO -->
-            <div class="card-longo" style="margin-top: 25px;">
+            <div class="card-longo" style="margin-top: 15px;">
                 <h3>⚠️ Avisos Importantes</h3>
                 <form class="form-grid" onsubmit="addAviso(event)">
                     <input type="text" id="aviso-titulo" placeholder="Título do Aviso" required>
-                    <textarea id="aviso-texto" placeholder="Mensagem / Detalhes do Aviso" rows="2" required style="grid-column: span 2; padding: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-family: inherit;"></textarea>
+                    <textarea id="aviso-texto" placeholder="Mensagem do Aviso" rows="2" required style="grid-column: span 2; padding: 6px; background: #080807; color: #d1c7b7; border: 1px solid #2a2824; font-family: inherit;"></textarea>
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Publicar Aviso</button>
                 </form>
                 <div class="cards-container" id="grid-avisos"></div>
@@ -312,7 +308,6 @@
 
     </div>
 
-    <!-- SDKs DO FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="script.js"></script>
