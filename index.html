@@ -13,7 +13,7 @@
         <!-- CABEÇALHO -->
         <header>
             <h1>SAINTS</h1>
-            <p>"No fim... morremos todos."</p>
+            <p>Painel de Logística e Organização</p>
         </header>
 
         <!-- NAVEGAÇÃO -->
@@ -22,8 +22,8 @@
                 <button class="btn-nav ativo" onclick="mudarAba('inicio', this)"><span>🏕️</span> Início</button>
                 <button class="btn-nav" onclick="mudarAba('tarefas', this)"><span>📋</span> Tarefas</button>
                 <button class="btn-nav" onclick="mudarAba('pedidos-clientes', this)"><span>📌</span> Pedidos Clientes</button>
-                <button class="btn-nav" onclick="mudarAba('precos', this)"><span>💲</span> Preços</button>
-                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Produtos</button>
+                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Preços Produtos</button>
+                <button class="btn-nav" onclick="mudarAba('precos-extras', this)"><span>💵</span> Preços Extras</button>
             </div>
             <div class="nav-linha">
                 <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços Armas</button>
@@ -38,9 +38,7 @@
                 <button class="btn-nav" onclick="mudarAba('receitas', this)"><span>📜</span> Receitas</button>
                 <button class="btn-nav" onclick="mudarAba('roupa', this)"><span>👔</span> Roupa</button>
                 <button class="btn-nav" onclick="mudarAba('parcerias', this)"><span>🤝</span> Parcerias</button>
-            </div>
-            <div class="nav-linha">
-                <button class="btn-nav" onclick="mudarAba('reuniao', this)" style="grid-column: span 5;"><span>🗣️</span> Reunião</button>
+                <button class="btn-nav" onclick="mudarAba('reuniao', this)"><span>🗣️</span> Reunião</button>
             </div>
         </nav>
 
@@ -111,59 +109,66 @@
             </div>
         </div>
 
-        <!-- NOVA ABA PREÇOS (GERAL) -->
-        <div id="aba-precos" class="aba-conteudo">
-            <div class="card-longo">
-                <h3>💲 Tabela de Preços Geral</h3>
-                <form class="form-grid" onsubmit="addCardData(event, 'precos')">
-                    <input type="text" id="precos-nome" placeholder="Nome do Item / Serviço" required>
-                    <input type="text" id="precos-detalhes" placeholder="Preço / Informação" required>
-                    <input type="url" id="precos-imagem" placeholder="URL da Imagem (opcional)">
-                    <input type="url" id="precos-link" placeholder="URL do Link (opcional)">
-                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Preço</button>
-                </form>
-                <div class="cards-container" id="grid-precos"></div>
-            </div>
-        </div>
-
         <!-- ABA PREÇOS DE PRODUTOS -->
         <div id="aba-precos-produtos" class="aba-conteudo">
             <div class="card-longo">
                 <h3>💰 Preços de Produtos</h3>
                 <form class="form-grid" onsubmit="addCardData(event, 'produtos')">
                     <input type="text" id="produtos-nome" placeholder="Nome do Produto / Item" required>
-                    <input type="text" id="produtos-detalhes" placeholder="Preço Unitário / Detalhes" required>
-                    <input type="url" id="produtos-imagem" placeholder="URL da Imagem (opcional)">
-                    <input type="url" id="produtos-link" placeholder="URL do Link (opcional)">
+                    <input type="number" step="0.01" id="produtos-detalhes" placeholder="Preço Unitário (€)" required>
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Produto</button>
                 </form>
                 <div class="cards-container" id="grid-produtos"></div>
             </div>
         </div>
 
-        <!-- ABA PREÇOS DE ARMAS (ORIGINAL) -->
+        <!-- ABA PREÇOS EXTRAS -->
+        <div id="aba-precos-extras" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>💵 Preços Extras</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'extras')">
+                    <input type="text" id="extras-nome" placeholder="Nome do Item / Serviço" required>
+                    <input type="number" step="0.01" id="extras-detalhes" placeholder="Preço Unitário (€)" required>
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Preço Extra</button>
+                </form>
+                <div class="cards-container" id="grid-extras"></div>
+            </div>
+        </div>
+
+        <!-- ABA PREÇOS DE ARMAS -->
         <div id="aba-precos-armas" class="aba-conteudo">
             <div class="card-longo">
                 <h3>⚔️ Preços de Armas</h3>
-                <form class="form-grid" onsubmit="addArma(event)">
-                    <input type="text" id="arma-nome" placeholder="Nome da Arma" required>
-                    <input type="number" step="0.01" id="arma-preco" placeholder="Preço (€)" required style="grid-column: span 2;">
-                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Arma</button>
+                <form class="form-grid" onsubmit="addCardData(event, 'armas')">
+                    <input type="text" id="armas-nome" placeholder="Nome da Arma / Item" required>
+                    <input type="text" id="armas-detalhes" placeholder="Detalhes / Preço" required>
+                    <input type="url" id="armas-imagem" placeholder="URL da Imagem">
+                    <input type="url" id="armas-link" placeholder="URL do Link">
+                    <button class="btn-add" type="submit">Registar Preço</button>
                 </form>
                 <div class="cards-container" id="grid-armas"></div>
             </div>
         </div>
 
-        <!-- ABA ENCOMENDAS PEDIDAS -->
+        <!-- ABA ENCOMENDAS PEDIDAS (COM ACESSO A TODAS AS ABAS DE PREÇO) -->
         <div id="aba-encomendas-pedidas" class="aba-conteudo">
             <div class="card-longo">
                 <h3>📦 Encomendas Pedidas</h3>
-                <form class="form-grid" onsubmit="addEncomendaArma(event)">
+                <form class="form-grid" onsubmit="addEncomendaGeral(event)">
                     <input type="text" id="enc-comprador" placeholder="Nome do Comprador / Membro" required>
                     <input type="text" id="enc-fornecedor" placeholder="Fornecedor / Origem" required>
-                    <select id="enc-arma-select" required style="grid-column: span 2;">
-                        <option value="">-- Seleciona uma Arma cadastrada --</option>
+                    
+                    <select id="enc-categoria-select" onchange="atualizarSelectItensEncomenda()" required style="grid-column: span 2;">
+                        <option value="">-- Seleciona a Tabela de Preços --</option>
+                        <option value="produtos">Preços de Produtos</option>
+                        <option value="extras">Preços Extras</option>
+                        <option value="armas">Preços de Armas</option>
                     </select>
+
+                    <select id="enc-item-select" required style="grid-column: span 2;">
+                        <option value="">-- Primeiro seleciona a tabela acima --</option>
+                    </select>
+
                     <input type="number" id="enc-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Encomenda</button>
                 </form>
