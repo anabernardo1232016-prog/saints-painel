@@ -13,13 +13,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'precos', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
+const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'extras', 'armas', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
 
 let dadosGlobais = {};
 let tarefas = [];
 let pedidosClientes = [];
 let encomendasPedidas = [];
-let armasList = [];
 let reunioes = [];
 let faltas = [];
 let avisos = [];
@@ -38,12 +37,6 @@ db.ref('pedidos_clientes').on('value', (snapshot) => {
 db.ref('encomendas_pedidas').on('value', (snapshot) => {
     encomendasPedidas = snapshot.val() || [];
     carregarEncomendasPedidas();
-});
-
-db.ref('armas').on('value', (snapshot) => {
-    armasList = snapshot.val() || [];
-    carregarArmas();
-    atualizarSelectArmas();
 });
 
 db.ref('reunioes').on('value', (snapshot) => {
@@ -66,6 +59,7 @@ categorias.forEach(cat => {
         dadosGlobais[cat] = snapshot.val() || [];
         carregarCards(cat);
         if (cat === 'produtos') atualizarSelectProdutos();
+        if (cat === 'armas' || cat === 'produtos' || cat === 'extras') atualizarSelectItensEncomenda();
     });
 });
 
@@ -78,7 +72,6 @@ function mudarAba(idAba, btn) {
     btn.classList.add('ativo');
 
     if (idAba === 'pedidos-clientes') atualizarSelectProdutos();
-    if (idAba === 'encomendas-pedidas') atualizarSelectArmas();
 }
 
 // RELÓGIO
@@ -136,50 +129,30 @@ function atualizarSelectProdutos() {
 
     select.innerHTML = '<option value="">-- Seleciona um produto registrado --</option>';
     produtos.forEach((p, idx) => {
-        select.innerHTML += `<option value="${idx}">${p.nome} - ${p.detalhes}</option>`;
+        const preco = parseFloat(p.detalhes) || 0;
+        select.innerHTML += `<option value="${idx}">${p.nome} - ${preco.toFixed(2)}€ / un</option>`;
     });
 }
 
-function atualizarSelectArmas() {
-    const select = document.getElementById('enc-arma-select');
-    if (!select) return;
+function atualizarSelectItensEncomenda() {
+    const catSelect = document.getElementById('enc-categoria-select');
+    const itemSelect = document.getElementById('enc-item-select');
+    if (!catSelect || !itemSelect) return;
 
-    select.innerHTML = '<option value="">-- Seleciona uma Arma cadastrada --</option>';
-    armasList.forEach((a, idx) => {
-        select.innerHTML += `<option value="${idx}">${a.nome} - ${a.preco.toFixed(2)}€</option>`;
+    const cat = catSelect.value;
+    itemSelect.innerHTML = '<option value="">-- Seleciona o item --</option>';
+
+    if (!cat) return;
+
+    const lista = dadosGlobais[cat] || [];
+    lista.forEach((item, idx) => {
+        let precoTexto = item.detalhes;
+        if (cat === 'produtos' || cat === 'extras') {
+            const num = parseFloat(item.detalhes) || 0;
+            precoTexto = `${num.toFixed(2)}€`;
+        }
+        itemSelect.innerHTML += `<option value="${idx}">${item.nome} (${precoTexto})</option>`;
     });
-}
-
-// ARMAS (FORMATO ORIGINAL SIMPLES)
-function addArma(e) {
-    e.preventDefault();
-    const nome = document.getElementById('arma-nome').value.trim();
-    const preco = parseFloat(document.getElementById('arma-preco').value) || 0;
-
-    armasList.push({ nome, preco });
-    db.ref('armas').set(armasList);
-    e.target.reset();
-}
-
-function carregarArmas() {
-    const container = document.getElementById('grid-armas');
-    if (!container) return;
-    container.innerHTML = '';
-
-    armasList.forEach((item, index) => {
-        container.innerHTML += `
-            <div class="item-card">
-                <button class="btn-apagar-card" onclick="removerArma(${index})">✕</button>
-                <h4>⚔️ ${item.nome}</h4>
-                <div class="total-destaque">Preço: ${item.preco.toFixed(2)} €</div>
-            </div>
-        `;
-    });
-}
-
-function removerArma(index) {
-    armasList.splice(index, 1);
-    db.ref('armas').set(armasList);
 }
 
 // PEDIDOS CLIENTES
@@ -197,7 +170,6 @@ function addPedidoCliente(e) {
 
     const produtos = dadosGlobais['produtos'] || [];
     const produtoSel = produtos[prodIndex];
-    // Tenta extrair um valor numérico dos detalhes do produto ou assume 0
     const precoUnitario = parseFloat(produtoSel.detalhes) || 0;
     const total = precoUnitario * qtd;
 
@@ -236,26 +208,37 @@ function removerPedidoCliente(index) {
     db.ref('pedidos_clientes').set(pedidosClientes);
 }
 
-// ENCOMENDAS
-function addEncomendaArma(e) {
+// ENCOMENDAS (Geral com acesso a todas as categorias de preço)
+function addEncomendaGeral(e) {
     e.preventDefault();
     const comprador = document.getElementById('enc-comprador').value.trim();
     const fornecedor = document.getElementById('enc-fornecedor').value.trim();
-    const armaIndex = document.getElementById('enc-arma-select').value;
+    const cat = document.getElementById('enc-categoria-select').value;
+    const itemIndex = document.getElementById('enc-item-select').value;
     const qtd = parseInt(document.getElementById('enc-qtd').value);
 
-    if (armaIndex === "") {
-        alert("Regista primeiro uma arma!");
+    if (cat === "" || itemIndex === "") {
+        alert("Seleciona a categoria e o item!");
         return;
     }
 
-    const armaSel = armasList[armaIndex];
-    const precoUnitario = parseFloat(armaSel.preco) || 0;
+    const lista = dadosGlobais[cat] || [];
+    const itemSel = lista[itemIndex];
+    
+    let precoUnitario = 0;
+    if (cat === 'produtos' || cat === 'extras') {
+        precoUnitario = parseFloat(itemSel.detalhes) || 0;
+    } else {
+        // Se for armas, tenta extrair um número dos detalhes ou assume 0 se for texto livre
+        precoUnitario = parseFloat(itemSel.detalhes) || 0;
+    }
+
     const total = precoUnitario * qtd;
 
-    encomendasPedidas.push({ comprador, fornecedor, item: armaSel.nome, qtd, precoUnitario, total });
+    encomendasPedidas.push({ comprador, fornecedor, item: itemSel.nome, qtd, precoUnitario, total });
     db.ref('encomendas_pedidas').set(encomendasPedidas);
     e.target.reset();
+    document.getElementById('enc-item-select').innerHTML = '<option value="">-- Primeiro seleciona a tabela acima --</option>';
 }
 
 function carregarEncomendasPedidas() {
@@ -270,7 +253,7 @@ function carregarEncomendasPedidas() {
         container.innerHTML += `
             <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerEncomendaPedida(${index})">✕</button>
-                <h4>⚔️ ${item.item}</h4>
+                <h4>📦 ${item.item}</h4>
                 <div class="sub-info">👤 Comprador: ${item.comprador}</div>
                 <div class="sub-info">🏭 Fornecedor: ${item.fornecedor}</div>
                 <p>Qtd: <strong>${item.qtd}x</strong></p>
@@ -370,8 +353,8 @@ function carregarAvisos() {
 
     avisos.forEach((a, idx) => {
         container.innerHTML += `
+            <button class="btn-apagar-card" onclick="removerAviso(${idx})">✕</button>
             <div class="item-card">
-                <button class="btn-apagar-card" onclick="removerAviso(${idx})">✕</button>
                 <h4>⚠️ ${a.titulo}</h4>
                 <p style="margin-top: 4px;">${a.texto}</p>
             </div>
@@ -394,13 +377,19 @@ function carregarCards(categoria) {
     dados.forEach((item, index) => {
         const imgHtml = item.imagem ? `<img src="${item.imagem}" alt="${item.nome}" onerror="this.style.display='none'">` : '';
         const linkHtml = item.link ? `<a href="${item.link}" target="_blank">🔗 Abrir Link</a>` : '';
+        
+        let valorExibicao = item.detalhes;
+        if (categoria === 'produtos' || categoria === 'extras') {
+            const num = parseFloat(item.detalhes) || 0;
+            valorExibicao = `${num.toFixed(2)} € / un`;
+        }
 
         container.innerHTML += `
             <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerCardData('${categoria}', ${index})">✕</button>
                 ${imgHtml}
                 <h4>${item.nome}</h4>
-                <p>${item.detalhes}</p>
+                <p>${valorExibicao}</p>
                 ${linkHtml}
             </div>
         `;
