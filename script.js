@@ -1,4 +1,4 @@
-// 1. CONFIGURAÇÃO DO FIREBASE
+// 1. CONFIGURAÇÃO DO FIREBASE (COM O URL CORRETO)
 const firebaseConfig = {
     apiKey: "AIzaSyBR97HiVaf9kyywKoukzWArUSqp1maraUI",
     authDomain: "saints-panel.firebaseapp.com",
