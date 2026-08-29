@@ -13,7 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
+const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'precos', 'craft-saints', 'receitas', 'roupa', 'parcerias'];
 
 let dadosGlobais = {};
 let tarefas = [];
@@ -136,8 +136,7 @@ function atualizarSelectProdutos() {
 
     select.innerHTML = '<option value="">-- Seleciona um produto registrado --</option>';
     produtos.forEach((p, idx) => {
-        const preco = parseFloat(p.detalhes) || 0;
-        select.innerHTML += `<option value="${idx}">${p.nome} - ${preco.toFixed(2)}€ / un</option>`;
+        select.innerHTML += `<option value="${idx}">${p.nome} - ${p.detalhes}</option>`;
     });
 }
 
@@ -147,25 +146,23 @@ function atualizarSelectArmas() {
 
     select.innerHTML = '<option value="">-- Seleciona uma Arma cadastrada --</option>';
     armasList.forEach((a, idx) => {
-        const precoVenda = parseFloat(a.venda) || 0;
-        select.innerHTML += `<option value="${idx}">${a.nome} - ${precoVenda.toFixed(2)}€ / un</option>`;
+        select.innerHTML += `<option value="${idx}">${a.nome} - ${a.preco.toFixed(2)}€</option>`;
     });
 }
 
-// ARMAS (NOVO FORMATO)
+// ARMAS (FORMATO ORIGINAL SIMPLES)
 function addArma(e) {
     e.preventDefault();
     const nome = document.getElementById('arma-nome').value.trim();
-    const custo = parseFloat(document.getElementById('arma-custo').value) || 0;
-    const venda = parseFloat(document.getElementById('arma-venda').value) || 0;
+    const preco = parseFloat(document.getElementById('arma-preco').value) || 0;
 
-    armasList.push({ nome, custo, venda });
+    armasList.push({ nome, preco });
     db.ref('armas').set(armasList);
     e.target.reset();
 }
 
 function carregarArmas() {
-    const container = document.getElementById('grid-armas-novo');
+    const container = document.getElementById('grid-armas');
     if (!container) return;
     container.innerHTML = '';
 
@@ -174,8 +171,7 @@ function carregarArmas() {
             <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerArma(${index})">✕</button>
                 <h4>⚔️ ${item.nome}</h4>
-                <div class="sub-info">Preço Custo: ${item.custo.toFixed(2)} €</div>
-                <div class="total-destaque">Preço Venda: ${item.venda.toFixed(2)} €</div>
+                <div class="total-destaque">Preço: ${item.preco.toFixed(2)} €</div>
             </div>
         `;
     });
@@ -201,6 +197,7 @@ function addPedidoCliente(e) {
 
     const produtos = dadosGlobais['produtos'] || [];
     const produtoSel = produtos[prodIndex];
+    // Tenta extrair um valor numérico dos detalhes do produto ou assume 0
     const precoUnitario = parseFloat(produtoSel.detalhes) || 0;
     const total = precoUnitario * qtd;
 
@@ -253,7 +250,7 @@ function addEncomendaArma(e) {
     }
 
     const armaSel = armasList[armaIndex];
-    const precoUnitario = parseFloat(armaSel.venda) || 0;
+    const precoUnitario = parseFloat(armaSel.preco) || 0;
     const total = precoUnitario * qtd;
 
     encomendasPedidas.push({ comprador, fornecedor, item: armaSel.nome, qtd, precoUnitario, total });
@@ -397,19 +394,13 @@ function carregarCards(categoria) {
     dados.forEach((item, index) => {
         const imgHtml = item.imagem ? `<img src="${item.imagem}" alt="${item.nome}" onerror="this.style.display='none'">` : '';
         const linkHtml = item.link ? `<a href="${item.link}" target="_blank">🔗 Abrir Link</a>` : '';
-        
-        let valorExibicao = item.detalhes;
-        if (categoria === 'produtos') {
-            const num = parseFloat(item.detalhes) || 0;
-            valorExibicao = `${num.toFixed(2)} € / un`;
-        }
 
         container.innerHTML += `
             <div class="item-card">
                 <button class="btn-apagar-card" onclick="removerCardData('${categoria}', ${index})">✕</button>
                 ${imgHtml}
                 <h4>${item.nome}</h4>
-                <p>${valorExibicao}</p>
+                <p>${item.detalhes}</p>
                 ${linkHtml}
             </div>
         `;
