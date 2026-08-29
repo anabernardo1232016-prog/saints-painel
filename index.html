@@ -13,7 +13,7 @@
         <!-- CABEÇALHO -->
         <header>
             <h1>SAINTS</h1>
-            <p>Painel de Logística e Organização</p>
+            <p>"No fim... morremos todos."</p>
         </header>
 
         <!-- NAVEGAÇÃO -->
@@ -22,22 +22,25 @@
                 <button class="btn-nav ativo" onclick="mudarAba('inicio', this)"><span>🏕️</span> Início</button>
                 <button class="btn-nav" onclick="mudarAba('tarefas', this)"><span>📋</span> Tarefas</button>
                 <button class="btn-nav" onclick="mudarAba('pedidos-clientes', this)"><span>📌</span> Pedidos Clientes</button>
-                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Preços Produtos</button>
-                <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços Armas</button>
+                <button class="btn-nav" onclick="mudarAba('precos', this)"><span>💲</span> Preços</button>
+                <button class="btn-nav" onclick="mudarAba('precos-produtos', this)"><span>💰</span> Produtos</button>
             </div>
             <div class="nav-linha">
+                <button class="btn-nav" onclick="mudarAba('precos-armas', this)"><span>⚔️</span> Preços Armas</button>
                 <button class="btn-nav" onclick="mudarAba('encomendas-pedidas', this)"><span>📦</span> Encomendas</button>
                 <button class="btn-nav" onclick="mudarAba('spots-vendas', this)"><span>📍</span> Spots Vendas</button>
                 <button class="btn-nav" onclick="mudarAba('spots-craft', this)"><span>🔨</span> Spots Craft</button>
                 <button class="btn-nav" onclick="mudarAba('spots-plantas', this)"><span>🌿</span> Spots Plantas</button>
-                <button class="btn-nav" onclick="mudarAba('spots-frutas', this)"><span>🍎</span> Spots Frutas</button>
             </div>
             <div class="nav-linha">
+                <button class="btn-nav" onclick="mudarAba('spots-frutas', this)"><span>🍎</span> Spots Frutas</button>
                 <button class="btn-nav" onclick="mudarAba('craft-saints', this)"><span>⚜️</span> Craft SAINTS</button>
                 <button class="btn-nav" onclick="mudarAba('receitas', this)"><span>📜</span> Receitas</button>
                 <button class="btn-nav" onclick="mudarAba('roupa', this)"><span>👔</span> Roupa</button>
                 <button class="btn-nav" onclick="mudarAba('parcerias', this)"><span>🤝</span> Parcerias</button>
-                <button class="btn-nav" onclick="mudarAba('reuniao', this)"><span>🗣️</span> Reunião</button>
+            </div>
+            <div class="nav-linha">
+                <button class="btn-nav" onclick="mudarAba('reuniao', this)" style="grid-column: span 5;"><span>🗣️</span> Reunião</button>
             </div>
         </nav>
 
@@ -108,30 +111,46 @@
             </div>
         </div>
 
+        <!-- NOVA ABA PREÇOS (GERAL) -->
+        <div id="aba-precos" class="aba-conteudo">
+            <div class="card-longo">
+                <h3>💲 Tabela de Preços Geral</h3>
+                <form class="form-grid" onsubmit="addCardData(event, 'precos')">
+                    <input type="text" id="precos-nome" placeholder="Nome do Item / Serviço" required>
+                    <input type="text" id="precos-detalhes" placeholder="Preço / Informação" required>
+                    <input type="url" id="precos-imagem" placeholder="URL da Imagem (opcional)">
+                    <input type="url" id="precos-link" placeholder="URL do Link (opcional)">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Preço</button>
+                </form>
+                <div class="cards-container" id="grid-precos"></div>
+            </div>
+        </div>
+
         <!-- ABA PREÇOS DE PRODUTOS -->
         <div id="aba-precos-produtos" class="aba-conteudo">
             <div class="card-longo">
                 <h3>💰 Preços de Produtos</h3>
                 <form class="form-grid" onsubmit="addCardData(event, 'produtos')">
                     <input type="text" id="produtos-nome" placeholder="Nome do Produto / Item" required>
-                    <input type="number" step="0.01" id="produtos-detalhes" placeholder="Preço Unitário (€)" required>
+                    <input type="text" id="produtos-detalhes" placeholder="Preço Unitário / Detalhes" required>
+                    <input type="url" id="produtos-imagem" placeholder="URL da Imagem (opcional)">
+                    <input type="url" id="produtos-link" placeholder="URL do Link (opcional)">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Produto</button>
                 </form>
                 <div class="cards-container" id="grid-produtos"></div>
             </div>
         </div>
 
-        <!-- ABA PREÇOS DE ARMAS (SEPARADA E COM CAMPO EXTRA) -->
+        <!-- ABA PREÇOS DE ARMAS (ORIGINAL) -->
         <div id="aba-precos-armas" class="aba-conteudo">
             <div class="card-longo">
                 <h3>⚔️ Preços de Armas</h3>
                 <form class="form-grid" onsubmit="addArma(event)">
-                    <input type="text" id="arma-nome" placeholder="Nome da Arma / Munição" required>
-                    <input type="number" step="0.01" id="arma-custo" placeholder="Preço de Custo (€)" required>
-                    <input type="number" step="0.01" id="arma-venda" placeholder="Preço de Venda (€)" required style="grid-column: span 2;">
-                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Arma / Munição</button>
+                    <input type="text" id="arma-nome" placeholder="Nome da Arma" required>
+                    <input type="number" step="0.01" id="arma-preco" placeholder="Preço (€)" required style="grid-column: span 2;">
+                    <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Arma</button>
                 </form>
-                <div class="cards-container" id="grid-armas-novo"></div>
+                <div class="cards-container" id="grid-armas"></div>
             </div>
         </div>
 
