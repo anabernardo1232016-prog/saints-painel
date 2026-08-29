@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAINTS - "No fim...morremos."</title>
+    <title>SAINTS - Painel de Logística e Organização</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,12 +13,12 @@
         <!-- CABEÇALHO -->
         <header>
             <h1>SAINTS</h1>
-            <p>"No fim...morremos."</p>
+            <p>Painel de Logística e Organização</p>
         </header>
 
         <hr class="linha-divisoria">
 
-        <!-- NAVEGAÇÃO / BOTÕES -->
+        <!-- NAVEGAÇÃO -->
         <nav>
             <div class="nav-linha">
                 <button class="btn-nav ativo" onclick="mudarAba('inicio', this)"><span>🏕️</span> Início</button>
@@ -44,12 +44,10 @@
         <!-- ABA INÍCIO -->
         <div id="aba-inicio" class="aba-conteudo ativa">
             <span class="badge-bemvindo">Bem-Vindo</span>
-            
             <div class="header-visao">
                 <h2>Visão Geral</h2>
                 <div class="relogio" id="relogio">00:00:00</div>
             </div>
-            
             <div class="data-atual" id="data-extenso">sábado, 29 de agosto de 2026</div>
 
             <div class="grid-cards">
@@ -100,15 +98,12 @@
                 <form class="form-grid" onsubmit="addPedidoCliente(event)">
                     <input type="text" id="pedido-cliente" placeholder="Nome do Cliente" required>
                     <input type="text" id="pedido-empresa" placeholder="Correio / Empresa" required>
-                    
                     <select id="pedido-produto-select" required style="grid-column: span 2;">
                         <option value="">-- Seleciona um produto registrado --</option>
                     </select>
-
                     <input type="number" id="pedido-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Emite Fatura / Registar Pedido</button>
                 </form>
-
                 <div class="cards-container" id="grid-pedidos-clientes"></div>
             </div>
         </div>
@@ -146,15 +141,12 @@
                 <form class="form-grid" onsubmit="addEncomendaArma(event)">
                     <input type="text" id="enc-comprador" placeholder="Nome do Comprador / Membro" required>
                     <input type="text" id="enc-fornecedor" placeholder="Fornecedor / Origem" required>
-                    
                     <select id="enc-arma-select" required style="grid-column: span 2;">
                         <option value="">-- Seleciona uma Arma / Munição cadastrada --</option>
                     </select>
-
                     <input type="number" id="enc-qtd" placeholder="Quantidade" min="1" value="1" required style="grid-column: span 2;">
                     <button class="btn-add" type="submit" style="grid-column: span 2;">Registar Encomenda</button>
                 </form>
-
                 <div class="cards-container" id="grid-encomendas-pedidas"></div>
             </div>
         </div>
@@ -266,13 +258,9 @@
 
     </div>
 
-    <!-- ... resto do teu HTML ... -->
-
-    <!-- SCRIPTS DO FIREBASE (Adicionar aqui) -->
+    <!-- SDKs DO FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
-    <!-- Teu script original -->
     <script src="script.js"></script>
 </body>
 </html>
