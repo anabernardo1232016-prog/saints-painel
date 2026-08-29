@@ -1,4 +1,4 @@
-// 1. CONFIGURAÇÃO DO FIREBASE (COM O URL CORRETO)
+// CONFIGURAÇÃO DO FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyBR97HiVaf9kyywKoukzWArUSqp1maraUI",
     authDomain: "saints-panel.firebaseapp.com",
@@ -14,36 +14,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Categorias dinâmicas do painel
 const categorias = ['vendas', 'plantas', 'frutas', 'craft', 'produtos', 'armas', 'craft-saints', 'receitas', 'roupa'];
 
-// Memória local cache
 let dadosGlobais = {};
 let tarefas = [];
 let pedidosClientes = [];
 let encomendasPedidas = [];
 
-// 2. SINCRONIZAÇÃO EM TEMPO REAL (NUVEM -> ECRÃ)
-
-// Escutar Tarefas
+// ESCUTAR NUVEM (TEMPO REAL)
 db.ref('tarefas').on('value', (snapshot) => {
     tarefas = snapshot.val() || [];
     renderTarefas();
 });
 
-// Escutar Pedidos Clientes
 db.ref('pedidos_clientes').on('value', (snapshot) => {
     pedidosClientes = snapshot.val() || [];
     carregarPedidosClientes();
 });
 
-// Escutar Encomendas Pedidas
 db.ref('encomendas_pedidas').on('value', (snapshot) => {
     encomendasPedidas = snapshot.val() || [];
     carregarEncomendasPedidas();
 });
 
-// Escutar todas as outras categorias (Produtos, Armas, Spots, etc.)
 categorias.forEach(cat => {
     db.ref(`categoria_${cat}`).on('value', (snapshot) => {
         dadosGlobais[cat] = snapshot.val() || [];
@@ -53,7 +46,7 @@ categorias.forEach(cat => {
     });
 });
 
-// 3. ALTERNAR ABAS
+// ALTERNAR ABAS
 function mudarAba(idAba, btn) {
     document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.remove('ativa'));
     document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('ativo'));
@@ -65,7 +58,7 @@ function mudarAba(idAba, btn) {
     if (idAba === 'encomendas-pedidas') atualizarSelectArmas();
 }
 
-// RELÓGIO EM TEMPO REAL
+// RELÓGIO
 function atualizarRelogio() {
     const agora = new Date();
     const horas = String(agora.getHours()).padStart(2, '0');
@@ -78,7 +71,7 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 
-// GESTÃO DE TAREFAS
+// TAREFAS
 function renderTarefas() {
     const list = document.getElementById('lista-tarefas');
     if (!list) return;
@@ -112,7 +105,7 @@ function delTarefa(i) {
     db.ref('tarefas').set(tarefas);
 }
 
-// SELECTS DINÂMICOS
+// SELECTS
 function atualizarSelectProdutos() {
     const select = document.getElementById('pedido-produto-select');
     if (!select) return;
@@ -190,7 +183,7 @@ function removerPedidoCliente(index) {
     db.ref('pedidos_clientes').set(pedidosClientes);
 }
 
-// ENCOMENDAS PEDIDAS
+// ENCOMENDAS
 function addEncomendaArma(e) {
     e.preventDefault();
     const comprador = document.getElementById('enc-comprador').value.trim();
@@ -243,7 +236,7 @@ function removerEncomendaPedida(index) {
     db.ref('encomendas_pedidas').set(encomendasPedidas);
 }
 
-// OUTRAS ABAS (CARDS)
+// OUTROS CARDS
 function carregarCards(categoria) {
     const dados = dadosGlobais[categoria] || [];
     const container = document.getElementById(`grid-${categoria}`);
